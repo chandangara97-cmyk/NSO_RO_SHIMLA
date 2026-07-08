@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Directory Admin | NSO Regional Office, Shimla</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topstrip">
+  <span>Government of India | Ministry of Statistics and Programme Implementation</span>
+  <div><a href="#">हिन्दी</a> <a href="downloads.html">RTI</a></div>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="emblem">NSO</div>
+      <div>
+        <div class="brand-name">NSO Regional Office, Shimla</div>
+        <div class="brand-sub">National Statistics Office &middot; MoSPI &middot; Himachal Pradesh</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="mainnav">
+  <div class="mainnav-inner">
+    <a href="index.html">Home</a>
+    <a href="surveys.html">Surveys &amp; schemes</a>
+    <a href="office-network.html">Office network</a>
+    <a href="publications.html">Publications</a>
+    <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="staff-admin.html" class="active">Staff directory</a>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="wrap">
+    <div class="eyebrow">Internal &middot; restricted</div>
+    <h1 style="font-size:26px;">Staff directory admin</h1>
+    <p class="lead">Add, edit or remove staff shown on each office page &mdash; photo, name and designation. Changes save to this browser and appear immediately on the corresponding office page. This page is for internal use only &mdash; it should sit behind office login before going live.</p>
+
+    <h2 style="font-size:18px;margin-top:32px;">Select office</h2>
+    <div class="staff-admin-tabs" id="officeTabs"></div>
+
+    <div class="grid grid-2" style="margin-top:24px;align-items:start;grid-template-columns:380px 1fr;">
+      <div class="card edit-form" id="formCard">
+        <h3 id="formTitle" style="margin-bottom:14px;">Add staff member</h3>
+
+        <label for="staffName">Name</label>
+        <input type="text" id="staffName" placeholder="e.g. Priya Sharma">
+
+        <label for="staffDesignation">Designation</label>
+        <input type="text" id="staffDesignation" placeholder="e.g. Field Officer, PLFS">
+
+        <label for="staffPhoto">Photo</label>
+        <input type="file" id="staffPhoto" accept="image/*">
+        <div class="photo-preview-row">
+          <div id="photoPreviewWrap"></div>
+          <button type="button" class="btn btn-outline" id="clearPhotoBtn" style="padding:6px 12px;font-size:12px;">Remove photo</button>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:10px;">
+          <button class="btn btn-primary" id="saveStaffBtn">Add member</button>
+          <button class="btn btn-outline" id="cancelEditBtn" style="display:none;">Cancel</button>
+        </div>
+        <div class="save-msg-inline" id="saveMsgInline">Saved.</div>
+      </div>
+
+      <div>
+        <h3 style="font-size:16px;margin-bottom:4px;" id="listTitle">Current staff</h3>
+        <p style="font-size:12px;color:var(--ink-soft);margin:0 0 8px;">Edit or remove a member, or open the office page to see how the directory looks.</p>
+        <div class="staff-edit-grid" id="staffList"></div>
+        <div style="margin-top:18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+          <a class="btn btn-outline" id="viewPageLink" href="#" target="_blank" style="padding:9px 16px;font-size:12.5px;">Open office page &rarr;</a>
+          <button class="btn btn-secondary" id="resetOfficeBtn" style="padding:9px 16px;font-size:12.5px;background:transparent;border:1px solid var(--line);color:var(--ink-soft);">Reset to sample data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
+    <div><a href="office-network.html">Office network</a> &middot; <a href="index.html">Home</a></div>
+  </div>
+</footer>
+
+<script src="staff-data.js"></script>
+<script>
+var OFFICE_PAGES = {
+  shimla: 'office-shimla.html',
+  hamirpur: 'office-hamirpur.html',
+  dharamshala: 'office-dharamshala.html',
+  mandi: 'office-mandi.html'
+};
+
+var state = {
+  office: 'shimla',
+  editingId: null,
+  photoData: ''
+};
+
+function renderTabs() {
+  var wrap = document.getElementById('officeTabs');
+  wrap.innerHTML = NSOStaff.OFFICES.map(function (id) {
+    var cls = 'staff-admin-tab' + (id === state.office ? ' active' : '');
+    return '<button type="button" class="' + cls + '" data-office="' + id + '">' + NSOStaff.OFFICE_LABELS[id] + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(wrap.querySelectorAll('button'), function (btn) {
+    btn.addEventListener('click', function () {
+      state.office = btn.getAttribute('data-office');
+      resetForm();
+      renderTabs();
+      renderList();
+    });
+  });
+}
+
+function photoThumbHtml(photo, name, cls, fbCls) {
+  return photo
+    ? '<img class="' + cls + '" src="' + photo + '" alt="' + NSOStaff.escapeHtml(name) + '">'
+    : '<div class="' + cls + ' ' + fbCls + '">' + NSOStaff.initials(name) + '</div>';
+}
+
+function renderPhotoPreview() {
+  var wrap = document.getElementById('photoPreviewWrap');
+  wrap.innerHTML = photoThumbHtml(state.photoData, document.getElementById('staffName').value || '?', 'photo-preview', 'photo-preview-fallback');
+}
+
+function renderList() {
+  document.getElementById('listTitle').textContent = 'Current staff \u2014 ' + NSOStaff.OFFICE_LABELS[state.office];
+  document.getElementById('viewPageLink').href = OFFICE_PAGES[state.office];
+  var list = NSOStaff.getStaff(state.office);
+  var el = document.getElementById('staffList');
+  if (!list.length) {
+    el.innerHTML = '<p class="lead">No staff added yet.</p>';
+    return;
+  }
+  el.innerHTML = list.map(function (s) {
+    return (
+      '<div class="staff-edit-card">' +
+        photoThumbHtml(s.photo, s.name, 'staff-edit-thumb', 'staff-edit-thumb-fallback') +
+        '<div class="staff-edit-body">' +
+          '<div class="name">' + NSOStaff.escapeHtml(s.name) + '</div>' +
+          '<div class="role">' + NSOStaff.escapeHtml(s.designation) + '</div>' +
+          '<div class="staff-edit-actions">' +
+            '<button type="button" data-edit="' + s.id + '">Edit</button>' +
+            '<button type="button" class="danger" data-delete="' + s.id + '">Remove</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+
+  Array.prototype.forEach.call(el.querySelectorAll('[data-edit]'), function (btn) {
+    btn.addEventListener('click', function () { startEdit(btn.getAttribute('data-edit')); });
+  });
+  Array.prototype.forEach.call(el.querySelectorAll('[data-delete]'), function (btn) {
+    btn.addEventListener('click', function () { deleteStaff(btn.getAttribute('data-delete')); });
+  });
+}
+
+function startEdit(id) {
+  var list = NSOStaff.getStaff(state.office);
+  var s = list.filter(function (x) { return x.id === id; })[0];
+  if (!s) return;
+  state.editingId = id;
+  state.photoData = s.photo || '';
+  document.getElementById('staffName').value = s.name;
+  document.getElementById('staffDesignation').value = s.designation;
+  document.getElementById('formTitle').textContent = 'Edit staff member';
+  document.getElementById('saveStaffBtn').textContent = 'Save changes';
+  document.getElementById('cancelEditBtn').style.display = 'inline-block';
+  renderPhotoPreview();
+  window.scrollTo({ top: document.getElementById('formCard').offsetTop - 20, behavior: 'smooth' });
+}
+
+function resetForm() {
+  state.editingId = null;
+  state.photoData = '';
+  document.getElementById('staffName').value = '';
+  document.getElementById('staffDesignation').value = '';
+  document.getElementById('staffPhoto').value = '';
+  document.getElementById('formTitle').textContent = 'Add staff member';
+  document.getElementById('saveStaffBtn').textContent = 'Add member';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  renderPhotoPreview();
+}
+
+function deleteStaff(id) {
+  var list = NSOStaff.getStaff(state.office).filter(function (x) { return x.id !== id; });
+  NSOStaff.saveStaff(state.office, list);
+  if (state.editingId === id) resetForm();
+  renderList();
+}
+
+function saveStaff() {
+  var name = document.getElementById('staffName').value.trim();
+  var designation = document.getElementById('staffDesignation').value.trim();
+  if (!name || !designation) {
+    alert('Please enter both name and designation.');
+    return;
+  }
+  var list = NSOStaff.getStaff(state.office);
+  if (state.editingId) {
+    list = list.map(function (s) {
+      if (s.id !== state.editingId) return s;
+      return { id: s.id, name: name, designation: designation, photo: state.photoData };
+    });
+  } else {
+    list.push({ id: NSOStaff.uid(), name: name, designation: designation, photo: state.photoData });
+  }
+  NSOStaff.saveStaff(state.office, list);
+  resetForm();
+  renderList();
+  var msg = document.getElementById('saveMsgInline');
+  msg.textContent = 'Saved. Open the office page to see it.';
+  msg.classList.add('show');
+  setTimeout(function () { msg.classList.remove('show'); }, 2500);
+}
+
+function resetOfficeToSample() {
+  if (!confirm('Reset ' + NSOStaff.OFFICE_LABELS[state.office] + ' staff directory to sample placeholder data? This removes any edits made in this browser.')) return;
+  NSOStaff.resetStaff(state.office);
+  resetForm();
+  renderList();
+}
+
+document.getElementById('staffPhoto').addEventListener('change', function (e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function (ev) {
+    state.photoData = ev.target.result;
+    renderPhotoPreview();
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('staffName').addEventListener('input', renderPhotoPreview);
+document.getElementById('clearPhotoBtn').addEventListener('click', function () {
+  state.photoData = '';
+  document.getElementById('staffPhoto').value = '';
+  renderPhotoPreview();
+});
+document.getElementById('saveStaffBtn').addEventListener('click', saveStaff);
+document.getElementById('cancelEditBtn').addEventListener('click', resetForm);
+document.getElementById('resetOfficeBtn').addEventListener('click', resetOfficeToSample);
+
+renderTabs();
+resetForm();
+renderList();
+</script>
+
+</body>
+</html>
