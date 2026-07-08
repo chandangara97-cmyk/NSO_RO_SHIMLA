@@ -43,6 +43,19 @@
     <h1 style="font-size:26px;">Staff directory admin</h1>
     <p class="lead">Add, edit or remove staff shown on each office page &mdash; photo, name and designation. Changes save to this browser and appear immediately on the corresponding office page. This page is for internal use only &mdash; it should sit behind office login before going live.</p>
 
+    <div class="card" style="margin-top:28px;max-width:520px;">
+      <h3 style="margin-bottom:4px;">Leadership (shown above every office)</h3>
+      <p style="font-size:12px;color:var(--ink-soft);margin:0 0 12px;">This node sits at the very top of the hierarchy chart on all four office pages.</p>
+      <label for="ddgName">Name</label>
+      <input type="text" id="ddgName" placeholder="e.g. [Add name]">
+      <label for="ddgRole">Role</label>
+      <input type="text" id="ddgRole" placeholder="Deputy Director General (DDG)">
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary" id="saveLeadershipBtn" style="padding:8px 16px;font-size:12.5px;">Save leadership</button>
+        <span class="save-msg-inline" id="leadershipMsg" style="display:inline-block;margin-left:10px;">Saved.</span>
+      </div>
+    </div>
+
     <h2 style="font-size:18px;margin-top:32px;">Select office</h2>
     <div class="staff-admin-tabs" id="officeTabs"></div>
 
@@ -53,8 +66,26 @@
         <label for="staffName">Name</label>
         <input type="text" id="staffName" placeholder="e.g. Priya Sharma">
 
+        <label for="staffEmployeeId">Employee ID <span style="font-weight:400;">(optional)</span></label>
+        <input type="text" id="staffEmployeeId" placeholder="e.g. SUP.SML.68">
+
+        <label for="staffEmail">Email <span style="font-weight:400;">(optional)</span></label>
+        <input type="text" id="staffEmail" placeholder="e.g. name@gmail.com">
+
+        <label for="staffGender">Gender <span style="font-weight:400;">(optional)</span></label>
+        <select id="staffGender">
+          <option value="">Not specified</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+
         <label for="staffDesignation">Designation</label>
         <input type="text" id="staffDesignation" placeholder="e.g. Field Officer, PLFS">
+
+        <label for="staffTier">Level in hierarchy</label>
+        <select id="staffTier"></select>
+        <p style="font-size:11px;color:var(--ink-soft);margin:4px 0 0;">Controls where this person appears in the office hierarchy chart. Tier 1 is the office in-charge and appears at the top.</p>
 
         <label for="staffPhoto">Photo</label>
         <input type="file" id="staffPhoto" accept="image/*">
@@ -105,6 +136,34 @@ var state = {
   photoData: ''
 };
 
+function populateTierSelect() {
+  var sel = document.getElementById('staffTier');
+  sel.innerHTML = '';
+  for (var t = 1; t <= NSOStaff.TIER_COUNT; t++) {
+    var opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = 'Tier ' + t + ' \u2014 ' + NSOStaff.TIER_LABELS[t];
+    sel.appendChild(opt);
+  }
+}
+
+function loadLeadershipForm() {
+  var l = NSOStaff.getLeadership();
+  document.getElementById('ddgName').value = l.ddgName;
+  document.getElementById('ddgRole').value = l.ddgRole;
+}
+
+function saveLeadershipForm() {
+  NSOStaff.saveLeadership({
+    ddgName: document.getElementById('ddgName').value,
+    ddgRole: document.getElementById('ddgRole').value
+  });
+  var msg = document.getElementById('leadershipMsg');
+  msg.textContent = 'Saved.';
+  msg.classList.add('show');
+  setTimeout(function () { msg.classList.remove('show'); }, 2000);
+}
+
 function renderTabs() {
   var wrap = document.getElementById('officeTabs');
   wrap.innerHTML = NSOStaff.OFFICES.map(function (id) {
@@ -141,13 +200,15 @@ function renderList() {
     el.innerHTML = '<p class="lead">No staff added yet.</p>';
     return;
   }
+  list = list.slice().sort(function (a, b) { return a.tier - b.tier; });
   el.innerHTML = list.map(function (s) {
     return (
       '<div class="staff-edit-card">' +
         photoThumbHtml(s.photo, s.name, 'staff-edit-thumb', 'staff-edit-thumb-fallback') +
         '<div class="staff-edit-body">' +
-          '<div class="name">' + NSOStaff.escapeHtml(s.name) + '</div>' +
-          '<div class="role">' + NSOStaff.escapeHtml(s.designation) + '</div>' +
+          '<div class="name">' + NSOStaff.escapeHtml(s.name) + ' <span class="placeholder-tag" style="margin-left:4px;">Tier ' + s.tier + '</span></div>' +
+          '<div class="role">' + NSOStaff.escapeHtml(s.designation) + (s.employeeId ? ' &middot; ' + NSOStaff.escapeHtml(s.employeeId) : '') + '</div>' +
+          (s.email ? '<div class="role" style="color:var(--ink-soft);font-weight:400;">' + NSOStaff.escapeHtml(s.email) + '</div>' : '') +
           '<div class="staff-edit-actions">' +
             '<button type="button" data-edit="' + s.id + '">Edit</button>' +
             '<button type="button" class="danger" data-delete="' + s.id + '">Remove</button>' +
@@ -172,7 +233,11 @@ function startEdit(id) {
   state.editingId = id;
   state.photoData = s.photo || '';
   document.getElementById('staffName').value = s.name;
+  document.getElementById('staffEmployeeId').value = s.employeeId || '';
+  document.getElementById('staffEmail').value = s.email || '';
+  document.getElementById('staffGender').value = s.gender || '';
   document.getElementById('staffDesignation').value = s.designation;
+  document.getElementById('staffTier').value = NSOStaff.normalizeTier(s.tier);
   document.getElementById('formTitle').textContent = 'Edit staff member';
   document.getElementById('saveStaffBtn').textContent = 'Save changes';
   document.getElementById('cancelEditBtn').style.display = 'inline-block';
@@ -184,7 +249,11 @@ function resetForm() {
   state.editingId = null;
   state.photoData = '';
   document.getElementById('staffName').value = '';
+  document.getElementById('staffEmployeeId').value = '';
+  document.getElementById('staffEmail').value = '';
+  document.getElementById('staffGender').value = '';
   document.getElementById('staffDesignation').value = '';
+  document.getElementById('staffTier').value = NSOStaff.TIER_COUNT > 1 ? 2 : 1;
   document.getElementById('staffPhoto').value = '';
   document.getElementById('formTitle').textContent = 'Add staff member';
   document.getElementById('saveStaffBtn').textContent = 'Add member';
@@ -201,7 +270,11 @@ function deleteStaff(id) {
 
 function saveStaff() {
   var name = document.getElementById('staffName').value.trim();
+  var employeeId = document.getElementById('staffEmployeeId').value.trim();
+  var email = document.getElementById('staffEmail').value.trim();
+  var gender = document.getElementById('staffGender').value;
   var designation = document.getElementById('staffDesignation').value.trim();
+  var tier = NSOStaff.normalizeTier(document.getElementById('staffTier').value);
   if (!name || !designation) {
     alert('Please enter both name and designation.');
     return;
@@ -210,10 +283,10 @@ function saveStaff() {
   if (state.editingId) {
     list = list.map(function (s) {
       if (s.id !== state.editingId) return s;
-      return { id: s.id, name: name, designation: designation, photo: state.photoData };
+      return { id: s.id, name: name, employeeId: employeeId, email: email, gender: gender, designation: designation, tier: tier, photo: state.photoData };
     });
   } else {
-    list.push({ id: NSOStaff.uid(), name: name, designation: designation, photo: state.photoData });
+    list.push({ id: NSOStaff.uid(), name: name, employeeId: employeeId, email: email, gender: gender, designation: designation, tier: tier, photo: state.photoData });
   }
   NSOStaff.saveStaff(state.office, list);
   resetForm();
@@ -250,7 +323,10 @@ document.getElementById('clearPhotoBtn').addEventListener('click', function () {
 document.getElementById('saveStaffBtn').addEventListener('click', saveStaff);
 document.getElementById('cancelEditBtn').addEventListener('click', resetForm);
 document.getElementById('resetOfficeBtn').addEventListener('click', resetOfficeToSample);
+document.getElementById('saveLeadershipBtn').addEventListener('click', saveLeadershipForm);
 
+populateTierSelect();
+loadLeadershipForm();
 renderTabs();
 resetForm();
 renderList();

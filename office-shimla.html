@@ -45,56 +45,34 @@
     <p class="lead">Coordinates all PLFS, UFS and DTES field operations across Himachal Pradesh, and oversees the three sub-regional offices.</p>
 
     <h2 style="font-size:18px;margin-top:32px;">Office in-charge</h2>
-    <div class="incharge-card">
-      <div class="avatar">AK</div>
-      <div>
-        <div class="name">Ajay Kumar Kumawat</div>
-        <div class="role">Deputy Director</div>
-        <div class="meta">Overall charge of field operations, Himachal Pradesh region</div>
-      </div>
-    </div>
-    <p style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">Photo placeholder shown as initials &mdash; replace with official photograph.</p>
+    <div class="incharge-card" id="inchargeCard"></div>
 
     <h2 style="font-size:18px;margin-top:36px;">Office hierarchy</h2>
-    <div class="orgchart">
-      <div class="org-tier">
-        <div class="org-node top">
-          <div class="n-name">Ajay Kumar Kumawat</div>
-          <div class="n-role">Deputy Director</div>
-        </div>
-      </div>
-      <div class="org-connector"></div>
-      <div class="org-tier">
-        <div class="org-node">
-          <div class="n-name">[Add name]</div>
-          <div class="n-role">Assistant Director</div>
-        </div>
-        <div class="org-node">
-          <div class="n-name">[Add name]</div>
-          <div class="n-role">Senior Statistical Officer</div>
-        </div>
-      </div>
-      <div class="org-connector"></div>
-      <div class="org-tier">
-        <div class="org-node">
-          <div class="n-name">Field Officers</div>
-          <div class="n-role">PLFS / UFS / DTES</div>
-        </div>
-        <div class="org-node">
-          <div class="n-name">Field Investigators</div>
-          <div class="n-role">Data collection staff</div>
-        </div>
-      </div>
-    </div>
-
-    <h2 style="font-size:18px;margin-top:36px;">Staff directory</h2>
-    <p style="font-size:12px;color:var(--ink-soft);margin-top:-6px;">Managed from the <a href="staff-admin.html" style="color:var(--slate);text-decoration:underline;">Staff directory admin</a> page.</p>
-    <div class="staff-grid" id="staffGrid"></div>
+    <p style="font-size:12px;color:var(--ink-soft);margin-top:-6px;">Built automatically from the <a href="staff-admin.html" style="color:var(--slate);text-decoration:underline;">Staff directory admin</a> page &mdash; add, edit or reorder staff there and this chart updates on its own.</p>
+    <div class="orgchart" id="orgChart"></div>
   </div>
 </section>
 
 <script src="staff-data.js"></script>
-<script>NSOStaff.renderStaffGrid('staffGrid', 'shimla');</script>
+<script>
+NSOStaff.renderOrgChart('orgChart', 'shimla');
+
+(function renderIncharge() {
+  var list = NSOStaff.getStaff('shimla');
+  var lead = list.filter(function (s) { return s.tier === 1; })[0]
+    || { name: '[Add name]', designation: 'Deputy Director', photo: '' };
+  var avatar = lead.photo
+    ? '<img class="avatar" src="' + lead.photo + '" alt="' + NSOStaff.escapeHtml(lead.name) + '" style="object-fit:cover;">'
+    : '<div class="avatar">' + NSOStaff.initials(lead.name) + '</div>';
+  document.getElementById('inchargeCard').innerHTML =
+    avatar +
+    '<div>' +
+      '<div class="name">' + NSOStaff.escapeHtml(lead.name) + '</div>' +
+      '<div class="role">' + NSOStaff.escapeHtml(lead.designation) + '</div>' +
+      '<div class="meta">Overall charge of field operations, Himachal Pradesh region</div>' +
+    '</div>';
+})();
+</script>
 
 <footer>
   <div class="wrap">
