@@ -34,6 +34,7 @@
     <a href="office-network.html">Office network</a>
     <a href="publications.html">Publications</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="data-admin.html">Data admin</a>
   </div>
 </nav>
 
@@ -76,6 +77,8 @@
           <h3>Average daily wage</h3>
           <div class="viz-sub">Illustrative rates by occupation (Rs.)</div>
           <canvas id="alrlChart" height="180"></canvas>
+          <span class="viz-link" onclick="document.getElementById('modal_alrl').classList.add('open')">View detailed results &rarr;</span>
+          <div class="data-owner-note">Data owner: SRO in-charge concerned &middot; Verified by Deputy Director &middot; <a href="data-admin.html">manage data</a></div>
         </div>
         <div class="viz-block">
           <h3>Key figures</h3>
@@ -89,6 +92,17 @@
   </div>
 </section>
 
+
+<div class="modal-overlay" id="modal_alrl">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modal_alrl').classList.remove('open')">&times;</button>
+    <h3>Average daily wage &mdash; detailed results</h3>
+    <div class="modal-sub" id="modal_alrl_sub">Sample data, illustrative only</div>
+    <table class="data" id="modal_alrl_table"></table>
+    <div class="data-owner-note" id="modal_alrl_owner">Data owner: SRO in-charge concerned &middot; Verified by Deputy Director</div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
@@ -98,12 +112,17 @@
 
 
 <script>
+const dataKey_alrl = 'nso_data_alrl';
+const defaults_alrl = { labels: ['Ploughing', 'Sowing', 'Harvesting', 'Non-agri'], data: [320, 280, 310, 350] };
+const stored_alrl = localStorage.getItem(dataKey_alrl);
+const record_alrl = stored_alrl ? JSON.parse(stored_alrl) : { ...defaults_alrl, updatedBy: 'SRO in-charge concerned', updatedAt: 'Not yet updated' };
+
 new Chart(document.getElementById('alrlChart'), {
   type: 'bar',
   data: {
-    labels: ['Ploughing', 'Sowing', 'Harvesting', 'Non-agri'],
+    labels: record_alrl.labels,
     datasets: [{
-      data: [320, 280, 310, 350],
+      data: record_alrl.data,
       backgroundColor: '#2F6F62',
       borderRadius: 6,
       borderWidth: 0,
@@ -116,6 +135,10 @@ new Chart(document.getElementById('alrlChart'), {
     scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
   }
 });
+
+document.getElementById('modal_alrl_sub').textContent = 'Updated by ' + record_alrl.updatedBy + (record_alrl.updatedAt ? ' on ' + record_alrl.updatedAt : '');
+const tbl_alrl = document.getElementById('modal_alrl_table');
+tbl_alrl.innerHTML = '<tr><th>Category</th><th>Value</th></tr>' + record_alrl.labels.map((l,i) => `<tr><td>${l}</td><td>${record_alrl.data[i]}</td></tr>`).join('');
 </script>
 </body>
 </html>

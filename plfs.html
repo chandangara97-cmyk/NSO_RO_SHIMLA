@@ -34,6 +34,7 @@
     <a href="office-network.html">Office network</a>
     <a href="publications.html">Publications</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="data-admin.html">Data admin</a>
   </div>
 </nav>
 
@@ -90,6 +91,8 @@
           <h3>Employment indicators</h3>
           <div class="viz-sub">Illustrative HP estimates, sample data</div>
           <canvas id="plfsChart" height="180"></canvas>
+          <span class="viz-link" onclick="document.getElementById('modal_plfs').classList.add('open')">View detailed results &rarr;</span>
+          <div class="data-owner-note">Data owner: Field Officer, PLFS &middot; Verified by Deputy Director &middot; <a href="data-admin.html">manage data</a></div>
         </div>
         <div class="viz-block">
           <h3>Key figures</h3>
@@ -103,6 +106,17 @@
   </div>
 </section>
 
+
+<div class="modal-overlay" id="modal_plfs">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modal_plfs').classList.remove('open')">&times;</button>
+    <h3>Employment indicators &mdash; detailed results</h3>
+    <div class="modal-sub" id="modal_plfs_sub">Sample data, illustrative only</div>
+    <table class="data" id="modal_plfs_table"></table>
+    <div class="data-owner-note" id="modal_plfs_owner">Data owner: Field Officer, PLFS &middot; Verified by Deputy Director</div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
@@ -112,12 +126,17 @@
 
 
 <script>
+const dataKey_plfs = 'nso_data_plfs';
+const defaults_plfs = { labels: ['LFPR', 'WPR', 'Unemployment rate'], data: [52.1, 49.3, 5.4] };
+const stored_plfs = localStorage.getItem(dataKey_plfs);
+const record_plfs = stored_plfs ? JSON.parse(stored_plfs) : { ...defaults_plfs, updatedBy: 'Field Officer, PLFS', updatedAt: 'Not yet updated' };
+
 new Chart(document.getElementById('plfsChart'), {
   type: 'bar',
   data: {
-    labels: ['LFPR', 'WPR', 'Unemployment rate'],
+    labels: record_plfs.labels,
     datasets: [{
-      data: [52.1, 49.3, 5.4],
+      data: record_plfs.data,
       backgroundColor: '#2F6F62',
       borderRadius: 6,
       borderWidth: 0,
@@ -130,6 +149,10 @@ new Chart(document.getElementById('plfsChart'), {
     scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
   }
 });
+
+document.getElementById('modal_plfs_sub').textContent = 'Updated by ' + record_plfs.updatedBy + (record_plfs.updatedAt ? ' on ' + record_plfs.updatedAt : '');
+const tbl_plfs = document.getElementById('modal_plfs_table');
+tbl_plfs.innerHTML = '<tr><th>Category</th><th>Value</th></tr>' + record_plfs.labels.map((l,i) => `<tr><td>${l}</td><td>${record_plfs.data[i]}</td></tr>`).join('');
 </script>
 </body>
 </html>

@@ -34,6 +34,7 @@
     <a href="office-network.html">Office network</a>
     <a href="publications.html">Publications</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="data-admin.html">Data admin</a>
   </div>
 </nav>
 
@@ -82,6 +83,8 @@
           <h3>Household income sources</h3>
           <div class="viz-sub">Illustrative farm household split</div>
           <canvas id="sasChart" height="180"></canvas>
+          <span class="viz-link" onclick="document.getElementById('modal_sas').classList.add('open')">View detailed results &rarr;</span>
+          <div class="data-owner-note">Data owner: SRO in-charge concerned &middot; Verified by Deputy Director &middot; <a href="data-admin.html">manage data</a></div>
         </div>
         <div class="viz-block">
           <h3>Key figures</h3>
@@ -95,6 +98,17 @@
   </div>
 </section>
 
+
+<div class="modal-overlay" id="modal_sas">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modal_sas').classList.remove('open')">&times;</button>
+    <h3>Household income sources &mdash; detailed results</h3>
+    <div class="modal-sub" id="modal_sas_sub">Sample data, illustrative only</div>
+    <table class="data" id="modal_sas_table"></table>
+    <div class="data-owner-note" id="modal_sas_owner">Data owner: SRO in-charge concerned &middot; Verified by Deputy Director</div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
@@ -104,12 +118,17 @@
 
 
 <script>
+const dataKey_sas = 'nso_data_sas';
+const defaults_sas = { labels: ['Cultivation', 'Livestock', 'Wages', 'Other'], data: [41, 18, 29, 12] };
+const stored_sas = localStorage.getItem(dataKey_sas);
+const record_sas = stored_sas ? JSON.parse(stored_sas) : { ...defaults_sas, updatedBy: 'SRO in-charge concerned', updatedAt: 'Not yet updated' };
+
 new Chart(document.getElementById('sasChart'), {
   type: 'bar',
   data: {
-    labels: ['Cultivation', 'Livestock', 'Wages', 'Other'],
+    labels: record_sas.labels,
     datasets: [{
-      data: [41, 18, 29, 12],
+      data: record_sas.data,
       backgroundColor: '#2F6F62',
       borderRadius: 6,
       borderWidth: 0,
@@ -122,6 +141,10 @@ new Chart(document.getElementById('sasChart'), {
     scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
   }
 });
+
+document.getElementById('modal_sas_sub').textContent = 'Updated by ' + record_sas.updatedBy + (record_sas.updatedAt ? ' on ' + record_sas.updatedAt : '');
+const tbl_sas = document.getElementById('modal_sas_table');
+tbl_sas.innerHTML = '<tr><th>Category</th><th>Value</th></tr>' + record_sas.labels.map((l,i) => `<tr><td>${l}</td><td>${record_sas.data[i]}</td></tr>`).join('');
 </script>
 </body>
 </html>

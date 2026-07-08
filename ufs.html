@@ -34,6 +34,7 @@
     <a href="office-network.html">Office network</a>
     <a href="publications.html">Publications</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="data-admin.html">Data admin</a>
   </div>
 </nav>
 
@@ -88,6 +89,8 @@
           <h3>Block scrutiny progress</h3>
           <div class="viz-sub">Una town, current cycle</div>
           <canvas id="ufsChart" height="180"></canvas>
+          <span class="viz-link" onclick="document.getElementById('modal_ufs').classList.add('open')">View detailed results &rarr;</span>
+          <div class="data-owner-note">Data owner: Field Officer, UFS &middot; Verified by Deputy Director &middot; <a href="data-admin.html">manage data</a></div>
         </div>
         <div class="viz-block">
           <h3>Key figures</h3>
@@ -101,6 +104,17 @@
   </div>
 </section>
 
+
+<div class="modal-overlay" id="modal_ufs">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modal_ufs').classList.remove('open')">&times;</button>
+    <h3>Block scrutiny progress &mdash; detailed results</h3>
+    <div class="modal-sub" id="modal_ufs_sub">Sample data, illustrative only</div>
+    <table class="data" id="modal_ufs_table"></table>
+    <div class="data-owner-note" id="modal_ufs_owner">Data owner: Field Officer, UFS &middot; Verified by Deputy Director</div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
@@ -110,12 +124,17 @@
 
 
 <script>
+const dataKey_ufs = 'nso_data_ufs';
+const defaults_ufs = { labels: ['Scrutinized', 'Pending'], data: [58, 42] };
+const stored_ufs = localStorage.getItem(dataKey_ufs);
+const record_ufs = stored_ufs ? JSON.parse(stored_ufs) : { ...defaults_ufs, updatedBy: 'Field Officer, UFS', updatedAt: 'Not yet updated' };
+
 new Chart(document.getElementById('ufsChart'), {
   type: 'doughnut',
   data: {
-    labels: ['Scrutinized', 'Pending'],
+    labels: record_ufs.labels,
     datasets: [{
-      data: [58, 42],
+      data: record_ufs.data,
       backgroundColor: ['#C4791F', '#DEDACD', '#8FB8AD', '#B9C2D2'],
       borderRadius: 0,
       borderWidth: 2,
@@ -128,6 +147,10 @@ new Chart(document.getElementById('ufsChart'), {
     scales: {}
   }
 });
+
+document.getElementById('modal_ufs_sub').textContent = 'Updated by ' + record_ufs.updatedBy + (record_ufs.updatedAt ? ' on ' + record_ufs.updatedAt : '');
+const tbl_ufs = document.getElementById('modal_ufs_table');
+tbl_ufs.innerHTML = '<tr><th>Category</th><th>Value</th></tr>' + record_ufs.labels.map((l,i) => `<tr><td>${l}</td><td>${record_ufs.data[i]}</td></tr>`).join('');
 </script>
 </body>
 </html>

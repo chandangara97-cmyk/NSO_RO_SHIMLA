@@ -34,6 +34,7 @@
     <a href="office-network.html">Office network</a>
     <a href="publications.html">Publications</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="data-admin.html">Data admin</a>
   </div>
 </nav>
 
@@ -90,6 +91,8 @@
           <h3>Trip purpose split</h3>
           <div class="viz-sub">NSS 80th Round, illustrative HP sample</div>
           <canvas id="dtesChart" height="180"></canvas>
+          <span class="viz-link" onclick="document.getElementById('modal_dtes').classList.add('open')">View detailed results &rarr;</span>
+          <div class="data-owner-note">Data owner: Field Officer, DTES &middot; Verified by Deputy Director &middot; <a href="data-admin.html">manage data</a></div>
         </div>
         <div class="viz-block">
           <h3>Key figures</h3>
@@ -103,6 +106,17 @@
   </div>
 </section>
 
+
+<div class="modal-overlay" id="modal_dtes">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modal_dtes').classList.remove('open')">&times;</button>
+    <h3>Trip purpose split &mdash; detailed results</h3>
+    <div class="modal-sub" id="modal_dtes_sub">Sample data, illustrative only</div>
+    <table class="data" id="modal_dtes_table"></table>
+    <div class="data-owner-note" id="modal_dtes_owner">Data owner: Field Officer, DTES &middot; Verified by Deputy Director</div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
@@ -112,12 +126,17 @@
 
 
 <script>
+const dataKey_dtes = 'nso_data_dtes';
+const defaults_dtes = { labels: ['Leisure', 'Pilgrimage', 'Business', 'Other'], data: [46, 28, 15, 11] };
+const stored_dtes = localStorage.getItem(dataKey_dtes);
+const record_dtes = stored_dtes ? JSON.parse(stored_dtes) : { ...defaults_dtes, updatedBy: 'Field Officer, DTES', updatedAt: 'Not yet updated' };
+
 new Chart(document.getElementById('dtesChart'), {
   type: 'bar',
   data: {
-    labels: ['Leisure', 'Pilgrimage', 'Business', 'Other'],
+    labels: record_dtes.labels,
     datasets: [{
-      data: [46, 28, 15, 11],
+      data: record_dtes.data,
       backgroundColor: '#1B2A44',
       borderRadius: 6,
       borderWidth: 0,
@@ -130,6 +149,10 @@ new Chart(document.getElementById('dtesChart'), {
     scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
   }
 });
+
+document.getElementById('modal_dtes_sub').textContent = 'Updated by ' + record_dtes.updatedBy + (record_dtes.updatedAt ? ' on ' + record_dtes.updatedAt : '');
+const tbl_dtes = document.getElementById('modal_dtes_table');
+tbl_dtes.innerHTML = '<tr><th>Category</th><th>Value</th></tr>' + record_dtes.labels.map((l,i) => `<tr><td>${l}</td><td>${record_dtes.data[i]}</td></tr>`).join('');
 </script>
 </body>
 </html>

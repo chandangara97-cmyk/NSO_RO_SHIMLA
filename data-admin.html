@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Admin | NSO Regional Office, Shimla</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topstrip">
+  <span>Government of India | Ministry of Statistics and Programme Implementation</span>
+  <div><a href="#">हिन्दी</a> <a href="downloads.html">RTI</a></div>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="emblem">NSO</div>
+      <div>
+        <div class="brand-name">NSO Regional Office, Shimla</div>
+        <div class="brand-sub">National Statistics Office &middot; MoSPI &middot; Himachal Pradesh</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="mainnav">
+  <div class="mainnav-inner">
+    <a href="index.html">Home</a>
+    <a href="surveys.html">Surveys &amp; schemes</a>
+    <a href="office-network.html">Office network</a>
+    <a href="publications.html">Publications</a>
+    <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="data-admin.html" class="active">Data admin</a>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="wrap">
+    <div class="eyebrow">Internal &middot; restricted</div>
+    <h1 style="font-size:26px;">Who controls the visualised data</h1>
+    <p class="lead">Every chart on a survey page is sourced from a designated data owner, cross-checked by the Deputy Director before it appears publicly. This page is for internal use only &mdash; it should sit behind office login before going live.</p>
+
+    <h2 style="font-size:18px;margin-top:32px;">Data ownership by survey</h2>
+    <div style="max-width:640px;">
+      <div class="owner-row"><span class="survey-name">PLFS</span><span class="owner-name">Field Officer, PLFS</span><span class="owner-name">Verified by DD</span></div>
+      <div class="owner-row"><span class="survey-name">UFS</span><span class="owner-name">Field Officer, UFS</span><span class="owner-name">Verified by DD</span></div>
+      <div class="owner-row"><span class="survey-name">DTES</span><span class="owner-name">Field Officer, DTES</span><span class="owner-name">Verified by DD</span></div>
+      <div class="owner-row"><span class="survey-name">AL&ndash;RL</span><span class="owner-name">SRO in-charge concerned</span><span class="owner-name">Verified by DD</span></div>
+      <div class="owner-row"><span class="survey-name">ASUSE</span><span class="owner-name">SRO in-charge concerned</span><span class="owner-name">Verified by DD</span></div>
+      <div class="owner-row"><span class="survey-name">AIDIS</span><span class="owner-name">SRO in-charge concerned</span><span class="owner-name">Verified by DD</span></div>
+      <div class="owner-row"><span class="survey-name">SAS</span><span class="owner-name">SRO in-charge concerned</span><span class="owner-name">Verified by DD</span></div>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink-soft);margin-top:10px;">Deputy Director: Ajay Kumar Kumawat, final sign-off on all published figures.</p>
+
+    <h2 style="font-size:18px;margin-top:40px;">Update chart data</h2>
+    <p class="lead">Select a survey, edit the values, and save. The change updates the chart on that survey's page for this browser.</p>
+
+    <div class="card edit-form" style="max-width:440px;margin-top:16px;">
+      <label for="surveySelect">Survey</label>
+      <select id="surveySelect">
+        <option value="plfs">PLFS &mdash; LFPR, WPR, unemployment rate</option>
+        <option value="ufs">UFS &mdash; blocks scrutinized vs pending</option>
+        <option value="dtes">DTES &mdash; trip purpose split</option>
+        <option value="alrl">AL&ndash;RL &mdash; average daily wage</option>
+        <option value="asuse">ASUSE &mdash; enterprises by sector</option>
+        <option value="aidis">AIDIS &mdash; debt by source</option>
+        <option value="sas">SAS &mdash; household income sources</option>
+      </select>
+
+      <div id="fieldWrap"></div>
+
+      <label for="updatedBy">Updated by</label>
+      <input type="text" id="updatedBy" placeholder="Your name and designation">
+
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="saveData()">Save changes</button>
+      <div class="save-msg" id="saveMsg">Saved. Open the survey page to see it reflected.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
+    <div><a href="index.html">Home</a></div>
+  </div>
+</footer>
+
+<script>
+const defaults = {
+  plfs:  { labels: ['LFPR','WPR','Unemployment rate'], data: [52.1, 49.3, 5.4] },
+  ufs:   { labels: ['Scrutinized','Pending'], data: [58, 42] },
+  dtes:  { labels: ['Leisure','Pilgrimage','Business','Other'], data: [46, 28, 15, 11] },
+  alrl:  { labels: ['Ploughing','Sowing','Harvesting','Non-agri'], data: [320, 280, 310, 350] },
+  asuse: { labels: ['Trade','Manufacturing','Services'], data: [44, 27, 29] },
+  aidis: { labels: ['Institutional','Non-institutional'], data: [63, 37] },
+  sas:   { labels: ['Cultivation','Livestock','Wages','Other'], data: [41, 18, 29, 12] }
+};
+
+function loadKey(key) {
+  const stored = localStorage.getItem('nso_data_' + key);
+  return stored ? JSON.parse(stored) : { ...defaults[key], updatedBy: '', updatedAt: '' };
+}
+
+function renderFields() {
+  const key = document.getElementById('surveySelect').value;
+  const current = loadKey(key);
+  const wrap = document.getElementById('fieldWrap');
+  wrap.innerHTML = '';
+  current.labels.forEach((label, i) => {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `<label>${label}</label><input type="number" step="0.1" id="val_${i}" value="${current.data[i]}">`;
+    wrap.appendChild(wrapper);
+  });
+  document.getElementById('updatedBy').value = current.updatedBy || '';
+}
+
+function saveData() {
+  const key = document.getElementById('surveySelect').value;
+  const current = loadKey(key);
+  const newData = current.labels.map((_, i) => parseFloat(document.getElementById('val_' + i).value));
+  const record = {
+    labels: current.labels,
+    data: newData,
+    updatedBy: document.getElementById('updatedBy').value || 'Unspecified',
+    updatedAt: new Date().toLocaleDateString('en-IN')
+  };
+  localStorage.setItem('nso_data_' + key, JSON.stringify(record));
+  const msg = document.getElementById('saveMsg');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 3000);
+}
+
+document.getElementById('surveySelect').addEventListener('change', renderFields);
+renderFields();
+</script>
+
+</body>
+</html>

@@ -34,6 +34,7 @@
     <a href="office-network.html">Office network</a>
     <a href="publications.html">Publications</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
+    <a href="data-admin.html">Data admin</a>
   </div>
 </nav>
 
@@ -82,6 +83,8 @@
           <h3>Enterprises by sector</h3>
           <div class="viz-sub">Illustrative HP distribution</div>
           <canvas id="asuseChart" height="180"></canvas>
+          <span class="viz-link" onclick="document.getElementById('modal_asuse').classList.add('open')">View detailed results &rarr;</span>
+          <div class="data-owner-note">Data owner: SRO in-charge concerned &middot; Verified by Deputy Director &middot; <a href="data-admin.html">manage data</a></div>
         </div>
         <div class="viz-block">
           <h3>Key figures</h3>
@@ -95,6 +98,17 @@
   </div>
 </section>
 
+
+<div class="modal-overlay" id="modal_asuse">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modal_asuse').classList.remove('open')">&times;</button>
+    <h3>Enterprises by sector &mdash; detailed results</h3>
+    <div class="modal-sub" id="modal_asuse_sub">Sample data, illustrative only</div>
+    <table class="data" id="modal_asuse_table"></table>
+    <div class="data-owner-note" id="modal_asuse_owner">Data owner: SRO in-charge concerned &middot; Verified by Deputy Director</div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div><strong style="color:#fff;">NSO Regional Office, Shimla</strong><br>Block 34, SDA Complex, Kasumpti, Shimla, Himachal Pradesh 171009</div>
@@ -104,12 +118,17 @@
 
 
 <script>
+const dataKey_asuse = 'nso_data_asuse';
+const defaults_asuse = { labels: ['Trade', 'Manufacturing', 'Services'], data: [44, 27, 29] };
+const stored_asuse = localStorage.getItem(dataKey_asuse);
+const record_asuse = stored_asuse ? JSON.parse(stored_asuse) : { ...defaults_asuse, updatedBy: 'SRO in-charge concerned', updatedAt: 'Not yet updated' };
+
 new Chart(document.getElementById('asuseChart'), {
   type: 'doughnut',
   data: {
-    labels: ['Trade', 'Manufacturing', 'Services'],
+    labels: record_asuse.labels,
     datasets: [{
-      data: [44, 27, 29],
+      data: record_asuse.data,
       backgroundColor: ['#C4791F', '#DEDACD', '#8FB8AD', '#B9C2D2'],
       borderRadius: 0,
       borderWidth: 2,
@@ -122,6 +141,10 @@ new Chart(document.getElementById('asuseChart'), {
     scales: {}
   }
 });
+
+document.getElementById('modal_asuse_sub').textContent = 'Updated by ' + record_asuse.updatedBy + (record_asuse.updatedAt ? ' on ' + record_asuse.updatedAt : '');
+const tbl_asuse = document.getElementById('modal_asuse_table');
+tbl_asuse.innerHTML = '<tr><th>Category</th><th>Value</th></tr>' + record_asuse.labels.map((l,i) => `<tr><td>${l}</td><td>${record_asuse.data[i]}</td></tr>`).join('');
 </script>
 </body>
 </html>
