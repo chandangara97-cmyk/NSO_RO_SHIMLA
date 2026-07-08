@@ -6,6 +6,7 @@
 <title>UFS | NSO Regional Office, Shimla</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -54,6 +55,8 @@
 <section class="section">
   <div class="wrap">
     <div class="crumb"><a href="surveys.html">Surveys &amp; schemes</a> / UFS</div>
+    <div class="detail-layout">
+      <div>
 
     <div class="detail-block">
       <h2>When it started</h2>
@@ -79,6 +82,22 @@
       <h2>Field operation in Himachal Pradesh</h2>
       <p>Block scrutiny is currently underway for Una town, using the official scrutiny checklist to verify block boundaries and household counts against the previous frame.</p>
     </div>
+      </div>
+      <aside class="viz-panel">
+        <div class="viz-block">
+          <h3>Block scrutiny progress</h3>
+          <div class="viz-sub">Una town, current cycle</div>
+          <canvas id="ufsChart" height="180"></canvas>
+        </div>
+        <div class="viz-block">
+          <h3>Key figures</h3>
+          <div class="viz-sub">Sample data, illustrative only</div>
+          <div class="viz-stat"><span>Blocks total</span><strong>146</strong></div>
+          <div class="viz-stat"><span>Scrutinized</span><strong>85</strong></div>
+          <div class="viz-stat"><span>Pending</span><strong>61</strong></div>
+        </div>
+      </aside>
+    </div>
   </div>
 </section>
 
@@ -89,5 +108,26 @@
   </div>
 </footer>
 
+
+<script>
+new Chart(document.getElementById('ufsChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Scrutinized', 'Pending'],
+    datasets: [{
+      data: [58, 42],
+      backgroundColor: ['#C4791F', '#DEDACD', '#8FB8AD', '#B9C2D2'],
+      borderRadius: 0,
+      borderWidth: 2,
+      borderColor: '#F7F5F0'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } },
+    scales: {}
+  }
+});
+</script>
 </body>
 </html>

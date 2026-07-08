@@ -6,6 +6,7 @@
 <title>AL-RL | NSO Regional Office, Shimla</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -52,6 +53,8 @@
 <section class="section">
   <div class="wrap">
     <div class="crumb"><a href="surveys.html">Surveys &amp; schemes</a> / AL&ndash;RL</div>
+    <div class="detail-layout">
+      <div>
 
     <div class="detail-block">
       <h2>Motive of the survey</h2>
@@ -67,6 +70,22 @@
         <div class="analysis-item"><strong>Gender-wise wage gaps</strong>Differences in rates paid to men and women.</div>
       </div>
     </div>
+      </div>
+      <aside class="viz-panel">
+        <div class="viz-block">
+          <h3>Average daily wage</h3>
+          <div class="viz-sub">Illustrative rates by occupation (Rs.)</div>
+          <canvas id="alrlChart" height="180"></canvas>
+        </div>
+        <div class="viz-block">
+          <h3>Key figures</h3>
+          <div class="viz-sub">Sample data, illustrative only</div>
+          <div class="viz-stat"><span>Occupations tracked</span><strong>8</strong></div>
+          <div class="viz-stat"><span>Latest round</span><strong>Current</strong></div>
+          <div class="viz-stat"><span>Coverage</span><strong>Rural HP</strong></div>
+        </div>
+      </aside>
+    </div>
   </div>
 </section>
 
@@ -77,5 +96,26 @@
   </div>
 </footer>
 
+
+<script>
+new Chart(document.getElementById('alrlChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Ploughing', 'Sowing', 'Harvesting', 'Non-agri'],
+    datasets: [{
+      data: [320, 280, 310, 350],
+      backgroundColor: '#2F6F62',
+      borderRadius: 6,
+      borderWidth: 0,
+      borderColor: '#F7F5F0'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false, position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } },
+    scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+  }
+});
+</script>
 </body>
 </html>
