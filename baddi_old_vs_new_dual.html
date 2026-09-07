@@ -271,6 +271,7 @@ function updateGeoPosition(lat, lng, accuracy) {
       geoCircles[key].setRadius(accuracy);
     }
   });
+  document.getElementById('geo-status').style.color = '#a7f3d0';
   document.getElementById('geo-status').textContent = 'accuracy ±' + Math.round(accuracy) + 'm';
   if (firstFix) {
     mapOld.setView(latlng, Math.max(mapOld.getZoom(), 17));
@@ -279,12 +280,14 @@ function updateGeoPosition(lat, lng, accuracy) {
 }
 
 function geoError(err) {
-  let msg = 'Location error: ' + err.message;
-  if (err.code === 1) {
-    msg += '\n\nPermission was blocked, or this page is not running in a secure context. Geolocation only works over HTTPS (or when opened as a local file some browsers still allow it) — if this keeps failing, host the file (e.g. on himachalexplorer.in) and open it from there.';
-  }
-  alert(msg);
-  stopLocate();
+  let msg = 'location error';
+  if (err.code === 1) msg = 'permission denied — enable location for this app/browser';
+  else if (err.code === 2) msg = 'position unavailable';
+  else if (err.code === 3) msg = 'timed out, retrying…';
+  const status = document.getElementById('geo-status');
+  status.textContent = msg;
+  status.style.color = '#fca5a5';
+  if (err.code !== 3) stopLocate();
 }
 
 function startLocate() {
@@ -295,6 +298,9 @@ function startLocate() {
   const btn = document.getElementById('locate-btn');
   btn.classList.add('active');
   btn.textContent = '📍 Tracking…';
+  const status = document.getElementById('geo-status');
+  status.textContent = '';
+  status.style.color = '#a7f3d0';
   firstFix = true;
   watchId = navigator.geolocation.watchPosition(function (pos) {
     updateGeoPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy || 25);
