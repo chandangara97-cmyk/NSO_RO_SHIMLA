@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Block Boundary Recorder</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#667085;--bd:#d9dde3;--ac:#0f6e56;--ac2:#e1f5ee;--rd:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171a;--card:#1e2328;--tx:#eceff2;--mu:#98a2b3;--bd:#333b44;--ac:#3ecf9e;--ac2:#173b30;--rd:#ff7b6b}}
+:root[data-theme="dark"]{--bg:#14171a;--card:#1e2328;--tx:#eceff2;--mu:#98a2b3;--bd:#333b44;--ac:#3ecf9e;--ac2:#173b30;--rd:#ff7b6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.w{max-width:640px;margin:0 auto;padding:14px}
+h1{font-size:19px;margin:4px 0 12px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+.r{display:flex;gap:8px}
+.r>div{flex:1;min-width:0}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px;font-weight:600}
+input,textarea{width:100%;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;padding:9px;font:inherit}
+textarea{min-height:70px;resize:vertical}
+button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+button.on{background:var(--rd);color:#fff;border-color:var(--rd)}
+.h{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.h b{font-size:14px;color:var(--ac)}
+.bs{display:flex;gap:6px}
+.bs button{padding:5px 10px;font-size:13px}
+.rec{border-top:1px solid var(--bd);padding:10px 0}
+.rec:first-child{border-top:0}
+.rec pre{white-space:pre-wrap;margin:6px 0;font:13px/1.4 inherit;color:var(--mu)}
+.t{font-weight:600}
+.m{font-size:12px;color:var(--mu);min-height:16px;margin-top:6px}
+.cur{outline:2px solid var(--ac);outline-offset:1px}#hft{display:none;position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));background:var(--ac);color:#fff;border-radius:10px;padding:10px 12px;font-weight:600;text-align:center;z-index:9}.top{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Block Boundary Recorder</h1>
+<div class="c">
+ <div class="r">
+  <div><label>Town (optional)</label><input id="tn" placeholder="Town"></div>
+  <div><label>IV Unit</label><input id="iv" placeholder="e.g. 003"></div>
+ </div>
+ <div class="r" style="margin-top:8px">
+  <div><label>Ward</label><input id="wd" placeholder="Ward no."></div>
+  <div><label>Block</label><input id="bk" placeholder="Block no."></div>
+ </div>
+</div>
+<div class="c"><button class="p hfb" data-h="all" style="width:100%">🎙 Hands-free: boundaries + households</button><div class="m">Say your entry, then say "next". Say "stop" to end or "save" to save the record.</div></div>
+<div id="bds"></div>
+<div class="c">
+ <div class="h"><b>Households</b><button class="hfb" data-h="hh">🎙 Hands-free</button></div>
+ <label>Owner name</label>
+ <div class="r"><input id="hO" placeholder="Owner name"><button data-mi="hO">🎤</button></div>
+ <label style="margin-top:8px">Structure name</label>
+ <div class="r"><input id="hS" placeholder="Structure name"><button data-mi="hS">🎤</button></div>
+ <div class="r" style="margin-top:8px;align-items:flex-end"><div><label>Number of households</label><input id="hN" type="number" min="0" inputmode="numeric" placeholder="No."></div><button id="ah">+ Add</button></div>
+ <div id="hl" style="margin-top:6px"></div>
+</div>
+<div class="c">
+ <div class="top">
+  <button class="p" id="sv">Save record</button>
+  <button id="cp">Copy this</button>
+  <button id="cl">Clear</button>
+ </div>
+ <div class="m" id="msg"></div>
+</div>
+<div class="c">
+ <label>Saved records</label>
+ <input id="q" placeholder="Search IV / ward / block / text">
+ <div id="ls" style="margin-top:6px"></div>
+ <div class="top">
+  <button id="ca">Copy all</button>
+  <button id="ex">Backup (copy JSON)</button>
+  <button id="im">Restore (paste JSON)</button>
+ </div>
+</div>
+</div>
+<div id="hft"></div>
+<script>
+var hh=[];var D=['North','East','South','West'],KEY='blockBoundaries.v1',recs=[],editId=null,rec=null,recBtn=null;
+var $=function(i){return document.getElementById(i)};
+function ld(){try{recs=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){recs=[]}}
+function sa(){try{localStorage.setItem(KEY,JSON.stringify(recs))}catch(e){say('Could not save to this browser. Use Backup.')}}
+function say(t){$('msg').textContent=t}
+function cpy(t){
+ if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(t).then(function(){say('Copied')},function(){fb(t)})}
+ fb(t)
+}
+function fb(t){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');say('Copied')}catch(e){say('Copy failed')}document.body.removeChild(a)}
+var bd=$('bds');
+D.forEach(function(d){
+ var c=document.createElement('div');c.className='c';
+ c.innerHTML='<div class="h"><b>'+d+'</b><div class="bs"><button data-m="'+d+'">🎤 Speak</button><button data-c="'+d+'">Copy</button></div></div><textarea id="t'+d+'" placeholder="'+d+' boundary description"></textarea>';
+ bd.appendChild(c)
+});
+bd.addEventListener('click',function(e){
+ var b=e.target.closest('button');if(!b)return;
+ if(b.dataset.c){cpy($('t'+b.dataset.c).value);return}
+ if(b.dataset.m)mic(b)
+});
+function mic(b,el){
+ var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){say('Voice typing is not supported in this browser. Use the keyboard mic.');return}
+ if(rec){rec.stop();return}
+ var ta=el||$('t'+b.dataset.m);
+ rec=new SR();rec.lang='en-IN';rec.continuous=true;rec.interimResults=false;recBtn=b;
+ b.classList.add('on');b.dataset.l=b.textContent;b.textContent='⏹ Stop';say('Listening in English…');
+ rec.onresult=function(ev){
+  for(var i=ev.resultIndex;i<ev.results.length;i++){
+   if(ev.results[i].isFinal){var s=ev.results[i][0].transcript.trim();ta.value+=(ta.value&&!/\s$/.test(ta.value)?' ':'')+s}
+  }
+ };
+ rec.onerror=function(ev){say('Voice error: '+ev.error)};
+ rec.onend=function(){recBtn.classList.remove('on');recBtn.textContent=recBtn.dataset.l||'🎤 Speak';rec=null;recBtn=null;if($('msg').textContent.indexOf('Listening')===0)say('')};
+ try{rec.start()}catch(x){say('Could not start microphone')}
+}
+document.addEventListener('click',function(e){var b=e.target.closest('button[data-mi]');if(b)mic(b,$(b.dataset.mi))});
+function addH(){var o=$('hO').value.trim(),st=$('hS').value.trim(),n=$('hN').value.trim();if(!o&&!st&&!n)return false;hh.push({owner:o,structure:st,n:n});$('hO').value='';$('hS').value='';$('hN').value='';rh();return true}
+function rh(){$('hl').innerHTML=hh.map(function(h,i){return '<div class="rec"><div class="t">'+esc(h.structure||'-')+' · '+esc(h.owner||'-')+'</div><div class="m">Households: '+esc(h.n||'0')+'</div><div class="bs"><button data-hd="'+i+'">Remove</button></div></div>'}).join('')+(hh.length?'<div class="m">'+hh.length+' structures, '+tot(hh)+' households</div>':'')}
+function tot(a){return a.reduce(function(t,h){return t+(parseInt(h.n,10)||0)},0)}
+$('ah').onclick=addH;
+$('hl').addEventListener('click',function(e){var b=e.target.closest('button[data-hd]');if(b){hh.splice(+b.dataset.hd,1);rh()}});
+var hf=null,NW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90},LB={tNorth:'North',tEast:'East',tSouth:'South',tWest:'West',hO:'Owner name',hS:'Structure name',hN:'Number of households'};
+function toNum(t){var m=t.match(/\d+/);if(m)return m[0];var n=0,f=false;t.toLowerCase().split(/[\s-]+/).forEach(function(w){if(w in NW){n+=NW[w];f=true}else if(w==='hundred'){n=(n||1)*100;f=true}});return f?String(n):''}
+function hfShow(){
+ document.querySelectorAll('.cur').forEach(function(e){e.classList.remove('cur')});
+ var id=hf.ids[hf.i],el=$(id);el.classList.add('cur');el.scrollIntoView({block:'center',behavior:'smooth'});
+ var t=$('hft');t.style.display='block';t.textContent='🎙 '+LB[id]+' — say "next" · "stop" · "save"'
+}
+function hfStop(){
+ if(!hf)return;hf.on=false;try{hf.r.stop()}catch(e){}hf=null;
+ document.querySelectorAll('.cur').forEach(function(e){e.classList.remove('cur')});
+ $('hft').style.display='none';document.querySelectorAll('.hfb').forEach(function(b){b.classList.remove('on')})
+}
+function hfAdv(){
+ var id=hf.ids[hf.i];
+ if(id==='hN'){addH();hf.i=hf.ids.indexOf('hO')}else hf.i++;
+ hfShow()
+}
+function hfPut(t){
+ var el=$(hf.ids[hf.i]);t=t.trim();if(!t)return;
+ if(el.id==='hN'){var n=toNum(t);if(n!=='')el.value=n}
+ else el.value+=(el.value&&!/\s$/.test(el.value)?' ':'')+t
+}
+function hfHandle(t){
+ var l=t.toLowerCase().trim().replace(/[.,!?]/g,'');
+ if(l==='stop'||l==='stop listening'){hfStop();return}
+ if(l==='save'||l==='save record'){var b=hf.btn;hfStop();$('sv').click();return}
+ t.split(/\bnext\b/i).forEach(function(part,k,a){if(!hf)return;hfPut(part);if(k<a.length-1)hfAdv()})
+}
+function hfListen(){
+ var SR=window.SpeechRecognition||window.webkitSpeechRecognition,r=new SR();
+ r.lang='en-IN';r.continuous=true;r.interimResults=false;hf.r=r;
+ r.onresult=function(ev){for(var i=ev.resultIndex;i<ev.results.length;i++)if(ev.results[i].isFinal&&hf)hfHandle(ev.results[i][0].transcript)};
+ r.onerror=function(ev){if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){say('Microphone blocked');hfStop()}};
+ r.onend=function(){if(hf&&hf.on)setTimeout(function(){if(hf&&hf.on){try{hfListen()}catch(e){}}},150)};
+ try{r.start()}catch(e){}
+}
+document.addEventListener('click',function(e){
+ var b=e.target.closest('.hfb');if(!b)return;
+ if(hf){hfStop();return}
+ var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){say('Voice typing is not supported in this browser. Use Chrome.');return}
+ if(rec){rec.onend=null;try{rec.stop()}catch(x){}rec=null}
+ var hs=['hO','hS','hN'];
+ hf={ids:b.dataset.h==='all'?['tNorth','tEast','tSouth','tWest'].concat(hs):hs,i:0,on:true,btn:b};
+ b.classList.add('on');hfShow();hfListen()
+});
+function cur(){addH();var o={id:editId||String(Date.now()),town:$('tn').value.trim(),iv:$('iv').value.trim(),ward:$('wd').value.trim(),block:$('bk').value.trim()};D.forEach(function(d){o[d]=$('t'+d).value.trim()});o.hh=hh.slice();return o}
+function fmt(o){
+ var h=[o.town,o.iv?'IV '+o.iv:'',o.ward?'Ward '+o.ward:'',o.block?'Block '+o.block:''].filter(Boolean).join(', ');
+ var x=h+'\n'+D.map(function(d){return d+': '+(o[d]||'-')}).join('\n'),a=o.hh||[];
+ if(a.length)x+='\nHouseholds ('+tot(a)+'):\n'+a.map(function(g,i){return (i+1)+'. '+(g.structure||'-')+' | '+(g.owner||'-')+' | '+(g.n||'0')}).join('\n');
+ return x
+}
+function clr(){editId=null;['tn','iv','wd','bk'].forEach(function(i){$(i).value=''});D.forEach(function(d){$('t'+d).value=''});hh=[];rh();$('sv').textContent='Save record'}
+$('cl').onclick=function(){clr();say('')};
+$('cp').onclick=function(){cpy(fmt(cur()))};
+$('sv').onclick=function(){
+ var o=cur();
+ if(!o.iv&&!o.ward&&!o.block){say('Enter IV, ward or block first');return}
+ var i=recs.findIndex(function(r){return r.id===o.id});
+ if(i<0)i=recs.findIndex(function(r){return r.iv===o.iv&&r.ward===o.ward&&r.block===o.block&&r.town===o.town});
+ if(i>=0){o.id=recs[i].id;recs[i]=o}else recs.unshift(o);
+ sa();clr();rn();say('Saved')
+};
+function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function rn(){
+ var q=$('q').value.toLowerCase(),h='';
+ recs.filter(function(r){return !q||fmt(r).toLowerCase().indexOf(q)>=0}).forEach(function(r){
+  h+='<div class="rec"><div class="t">'+esc([r.town,r.iv?'IV '+r.iv:'',r.ward?'Ward '+r.ward:'',r.block?'Block '+r.block:''].filter(Boolean).join(' · '))+'</div><pre>'+esc(D.map(function(d){return d+': '+(r[d]||'-')}).join('\n'))+'</pre>'+((r.hh&&r.hh.length)?'<div class="m" style="white-space:pre-wrap">Households ('+tot(r.hh)+'):\n'+esc(r.hh.map(function(g,i){return (i+1)+'. '+(g.structure||'-')+' | '+(g.owner||'-')+' | '+(g.n||'0')}).join('\n'))+'</div>':'')+'<div class="bs" style="margin-top:6px"><button data-a="c" data-i="'+r.id+'">Copy</button><button data-a="e" data-i="'+r.id+'">Edit</button><button data-a="d" data-i="'+r.id+'">Delete</button></div></div>'
+ });
+ $('ls').innerHTML=h||'<div class="m">No records yet</div>'
+}
+$('q').oninput=rn;
+$('ls').addEventListener('click',function(e){
+ var b=e.target.closest('button');if(!b)return;
+ var r=recs.find(function(x){return x.id===b.dataset.i});if(!r)return;
+ if(b.dataset.a==='c')cpy(fmt(r));
+ else if(b.dataset.a==='e'){editId=r.id;$('tn').value=r.town;$('iv').value=r.iv;$('wd').value=r.ward;$('bk').value=r.block;D.forEach(function(d){$('t'+d).value=r[d]||''});hh=(r.hh||[]).slice();rh();$('sv').textContent='Update record';window.scrollTo(0,0)}
+ else if(b.dataset.a==='d'){if(b.textContent==='Delete'){b.textContent='Sure?';return}recs=recs.filter(function(x){return x.id!==r.id});sa();rn()}
+});
+$('ca').onclick=function(){cpy(recs.map(fmt).join('\n\n'))};
+$('ex').onclick=function(){cpy(JSON.stringify(recs))};
+$('im').onclick=function(){
+ var t=prompt('Paste backup JSON');if(!t)return;
+ try{var a=JSON.parse(t);a.forEach(function(n){if(!recs.some(function(r){return r.id===n.id}))recs.push(n)});sa();rn();say('Restored')}catch(e){say('Invalid backup')}
+};
+ld();rn();
+</script>
+<script src="assets/tools.js"></script><script src="assets/hub-nav.js"></script>
+</body>
+</html>

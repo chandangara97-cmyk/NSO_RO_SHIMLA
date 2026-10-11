@@ -22,7 +22,7 @@
 <header class="site-header">
   <div class="header-inner">
     <div class="brand">
-      <div class="emblem">NSO</div>
+      
       <div>
         <div class="brand-name">NSO Regional Office, Shimla</div>
         <div class="brand-sub">National Statistics Office &middot; MoSPI &middot; Himachal Pradesh</div>
@@ -36,7 +36,8 @@
     <a href="index.html" class="active">Home</a>
     <a href="surveys.html">Surveys &amp; schemes</a>
     <a href="office-network.html">Office network</a>
-    <a href="publications.html">Publications</a>
+    <a href="publications.html">Reports &amp; indices</a>
+    <a href="tools.html">Field tools</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
     <a href="staff-admin.html">Staff directory</a>
   </div>
@@ -121,11 +122,21 @@
 
 <section class="section">
   <div class="wrap">
+    <div class="eyebrow">Information &amp; reports</div>
+    <h2 style="font-size:20px;margin-bottom:6px;">Latest from MoSPI and HP Statistics</h2>
+    <ul class="replist" id="replist"></ul>
+    <div class="repmeta" id="repmeta"></div>
+    <p style="margin-top:12px;"><a href="publications.html" class="btn btn-outline">All reports, indices &amp; release calendar</a></p>
+  </div>
+</section>
+
+<section class="section-tight" style="background:var(--slate-light);">
+  <div class="wrap">
     <div class="eyebrow">Quick links</div>
     <div class="grid grid-4">
+      <a href="publications.html" class="card"><h3 style="font-size:14px;">Reports &amp; indices</h3><p>MoSPI and HP Statistics releases</p></a>
+      <a href="tools.html" class="card"><h3 style="font-size:14px;">Field tools</h3><p>PLFS, UFS, bills and GIS tools</p></a>
       <a href="downloads.html" class="card"><h3 style="font-size:14px;">Forms &amp; schedules</h3><p>Survey annexures, checklists</p></a>
-      <a href="publications.html" class="card"><h3 style="font-size:14px;">Publications</h3><p>HP-level reports and data</p></a>
-      <a href="downloads.html" class="card"><h3 style="font-size:14px;">Circulars</h3><p>Official notices and orders</p></a>
       <a href="downloads.html" class="card"><h3 style="font-size:14px;">RTI &amp; grievance</h3><p>File requests, track status</p></a>
     </div>
   </div>
@@ -146,5 +157,8 @@
   </div>
 </footer>
 
+<script src="data/reports.js"></script>
+<script src="reports-ui.js"></script>
+<script>NSO_renderReports({listId:"replist",metaId:"repmeta",limit:5});</script>
 </body>
 </html>

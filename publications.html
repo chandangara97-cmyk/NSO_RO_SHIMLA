@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Publications | NSO Regional Office, Shimla</title>
+<title>Reports &amp; indices | NSO Regional Office, Shimla</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -17,7 +17,7 @@
 <header class="site-header">
   <div class="header-inner">
     <div class="brand">
-      <div class="emblem">NSO</div>
+      
       <div>
         <div class="brand-name">NSO Regional Office, Shimla</div>
         <div class="brand-sub">National Statistics Office &middot; MoSPI &middot; Himachal Pradesh</div>
@@ -31,7 +31,8 @@
     <a href="index.html">Home</a>
     <a href="surveys.html">Surveys &amp; schemes</a>
     <a href="office-network.html">Office network</a>
-    <a href="publications.html" class="active">Publications</a>
+    <a href="publications.html" class="active">Reports &amp; indices</a>
+    <a href="tools.html">Field tools</a>
     <a href="downloads.html">Downloads &amp; RTI</a>
     <a href="staff-admin.html">Staff directory</a>
   </div>
@@ -39,37 +40,35 @@
 
 <section class="section">
   <div class="wrap">
-    <div class="eyebrow">Publications</div>
-    <h1 style="font-size:26px;">Himachal Pradesh, in the numbers</h1>
-    <p class="lead">State-level extracts from national survey reports, and plain-language explainers of what each survey measures.</p>
+    <div class="eyebrow">Information, indices &amp; reports</div>
+    <h1 style="font-size:26px;">Official statistics from MoSPI and Himachal Pradesh</h1>
+    <p class="lead">Reports, bulletins and indices released by the Ministry of Statistics and Programme Implementation (MoSPI) and the Department of Economics &amp; Statistics, Himachal Pradesh. The list below is checked automatically every day.</p>
 
-    <div class="grid grid-3" style="margin-top:24px;">
-      <div class="card">
-        <h3>PLFS annual report, HP extract</h3>
-        <p>Labour force participation, unemployment and worker population ratios for Himachal Pradesh.</p>
-      </div>
-      <div class="card">
-        <h3>DTES state factsheet</h3>
-        <p>Domestic visitor spend and trip characteristics, NSS 80th round HP sample.</p>
-      </div>
-      <div class="card">
-        <h3>UFS frame update note</h3>
-        <p>Summary of urban frame changes following the current scrutiny cycle.</p>
-      </div>
+    <h2 style="font-size:19px;margin-top:30px;">Latest releases</h2>
+    <div class="chiprow" id="repchips" role="group" aria-label="Filter by publisher">
+      <button class="chipbtn" data-org="all" aria-pressed="true">All</button>
+      <button class="chipbtn" data-org="MoSPI" aria-pressed="false">MoSPI</button>
+      <button class="chipbtn" data-org="HP Statistics" aria-pressed="false">HP Statistics</button>
+    </div>
+    <ul class="replist" id="replist"></ul>
+    <div class="repmeta" id="repmeta"></div>
+
+    <h2 style="font-size:19px;margin-top:40px;">Coming up</h2>
+    <ul class="replist" id="upcoming"></ul>
+
+    <h2 style="font-size:19px;margin-top:40px;">Key indices</h2>
+    <p class="lead">What the main national indices measure, and where they come from. Series and base years change; always confirm on the official release.</p>
+    <div class="grid grid-3" style="margin-top:14px;">
+      <div class="card"><h3>Consumer Price Index (CPI)</h3><p>Retail inflation. MoSPI announced a new series with base year 2024=100, scheduled from February 2026.</p></div>
+      <div class="card"><h3>Index of Industrial Production (IIP)</h3><p>Growth in mining, manufacturing and electricity. A new series with base 2022-23 was scheduled for May 2026.</p></div>
+      <div class="card"><h3>GDP / National Accounts</h3><p>Output and income of the economy. A new series with base year 2022-23 was scheduled for February 2026.</p></div>
+      <div class="card"><h3>PLFS bulletins</h3><p>Labour force participation, worker population ratio and unemployment. Monthly bulletins are scheduled for around the 15th, and quarterly bulletins each quarter.</p></div>
+      <div class="card"><h3>ASUSE</h3><p>Annual Survey of Unincorporated Sector Enterprises, with quarterly bulletins from MoSPI.</p></div>
+      <div class="card"><h3>HP: IIP, village directory, employee census</h3><p>The Himachal Pradesh Economics &amp; Statistics Department runs its own Index of Industrial Production, Village Level Directory and Employee Census services.</p></div>
     </div>
 
-    <h2 style="font-size:19px;margin-top:40px;">What these surveys actually measure</h2>
-    <p class="lead">Plain-language explainers, aimed at students, researchers and journalists rather than statisticians.</p>
-    <div class="grid grid-2" style="margin-top:14px;">
-      <div class="card">
-        <h3>What is PLFS?</h3>
-        <p>A household survey that asks people about their work in the past week and year, used to estimate how many people are employed, unemployed, or outside the labour force.</p>
-      </div>
-      <div class="card">
-        <h3>What does DTES capture?</h3>
-        <p>How much domestic tourists spend, where they go, and how long they stay &mdash; used to size the state's tourism economy.</p>
-      </div>
-    </div>
+    <h2 style="font-size:19px;margin-top:40px;">Official sources</h2>
+    <ul class="replist" id="pinned"></ul>
   </div>
 </section>
 
@@ -80,5 +79,8 @@
   </div>
 </footer>
 
+<script src="data/reports.js"></script>
+<script src="reports-ui.js"></script>
+<script>NSO_renderReports({listId:"replist",chipsId:"repchips",metaId:"repmeta",upcomingId:"upcoming",pinnedId:"pinned"});</script>
 </body>
 </html>
