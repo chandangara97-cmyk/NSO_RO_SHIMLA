@@ -12,6 +12,7 @@
 <header>
   <h1>Survey Indices Dashboard</h1>
   <p class="sub">Indices from field surveys conducted by central and state governments, in one place.</p>
+  <p style="margin:8px 0 0"><a href="tools.html" style="color:var(--c);font-weight:600">Field tools &rarr;</a></p>
 </header>
 <main>
   <div class="bar">
@@ -23,6 +24,10 @@
     </span>
   </div>
   <div class="grid" id="cards"></div>
+
+  <h2 id="tools">Field tools</h2>
+  <p class="sub" style="margin-bottom:10px">Pick the job you want to do. <a href="tools.html" style="color:var(--c)">See full details &rarr;</a></p>
+  <div id="toolgroups"></div>
 
   <h2>Upcoming releases</h2>
   <ul class="replist" id="upcoming"></ul>
@@ -42,6 +47,8 @@
 <script src="data/reports.js"></script>
 <script src="reports-ui.js"></script>
 <script src="dashboard.js"></script>
+<script src="tools/assets/tools.js"></script>
+<script src="home-tools.js"></script>
 <script>renderReports({listId:"replist",metaId:"repmeta",chipsId:"chips",upcomingId:"upcoming",limit:15});</script>
 </body>
 </html>
