@@ -30,12 +30,12 @@
 
   var btn = document.createElement('button');
   btn.className = 'nsohn-btn'; btn.type = 'button';
-  btn.setAttribute('aria-label', 'Open NSO Hub menu'); btn.title = 'NSO Hub — all tools';
+  btn.setAttribute('aria-label', 'Open tools menu'); btn.title = 'All tools';
   btn.innerHTML = window.NSO_icon('grid', 20);
 
   var ov = document.createElement('div'); ov.className = 'nsohn-ov';
-  var html = '<div class="nsohn-panel" role="dialog" aria-label="NSO Hub menu">' +
-    '<div class="nsohn-head"><b>NSO RO Shimla · Tools</b><a href="index.html">' + window.NSO_icon('home', 15) + ' Tools home</a></div>';
+  var html = '<div class="nsohn-panel" role="dialog" aria-label="Tools menu">' +
+    '<div class="nsohn-head"><b>Field Tools</b><a href="index.html">' + window.NSO_icon('home', 15) + ' Tools home</a></div>';
   window.NSO_CATEGORIES.forEach(function (c) {
     var items = window.NSO_TOOLS.filter(function (t) { return t.cat === c.id && t.status !== 'soon'; });
     if (!items.length) return;
@@ -45,7 +45,7 @@
         (t.isNew ? '<span class="nsohn-new">NEW</span>' : '') + '</a>';
     });
   });
-  html += '<div class="nsohn-foot"><a href="../index.html" style="color:#0b2545;font-weight:600">← Regional Office website</a> · Esc to close</div></div>';
+  html += '<div class="nsohn-foot">Esc to close</div></div>';
   ov.innerHTML = html;
 
   function open() { ov.classList.add('open'); }

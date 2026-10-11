@@ -1,4 +1,4 @@
-/* Single source of truth for every page in the NSO RO Shimla hub.
+/* Single source of truth for every page in the tools hub.
    The hub (index.html) and the floating quick-nav (hub-nav.js) both read this list.
    To add a new tool: copy its .html file into the project root and add ONE entry below. */
 window.NSO_CATEGORIES = [
