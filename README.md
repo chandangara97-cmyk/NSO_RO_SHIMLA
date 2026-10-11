@@ -1,1 +1,0 @@
-# NSO_RO_SHIMLA
