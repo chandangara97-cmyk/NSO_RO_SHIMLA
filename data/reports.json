@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-11T02:10:28+00:00",
+ "generated": "2026-10-12T09:32:25+00:00",
  "items": [],
  "pinned": [
   {
@@ -61,5 +61,24 @@
   }
  ],
  "upcoming_source": "MoSPI Advance Release Calendar 2026-27. Dates can change; check the calendar.",
- "status": {}
+ "status": {
+  "mospi-press": {
+   "ok": false,
+   "checked": "2026-10-12T09:32:25+00:00",
+   "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1010)>",
+   "lastOk": null,
+   "name": "MoSPI press releases",
+   "url": "https://ipm.mospi.gov.in/Home/ShowPressRelease",
+   "count": 0
+  },
+  "hp-des": {
+   "ok": false,
+   "checked": "2026-10-12T09:32:25+00:00",
+   "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1010)>",
+   "lastOk": null,
+   "name": "HP Department of Economics & Statistics",
+   "url": "https://himachalservices.nic.in/economics/",
+   "count": 0
+  }
+ }
 }
