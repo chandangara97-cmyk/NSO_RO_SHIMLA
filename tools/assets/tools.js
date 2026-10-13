@@ -6,6 +6,7 @@ window.NSO_CATEGORIES = [
   { id: 'ufs-ops',name: 'UFS · Progress & Planning',  full: 'Urban Frame Survey — field progress', blurb: 'Weekly • Monthly • Action plan',   color: '#059669' },
   { id: 'ufs-geo',name: 'UFS · Blocks & Boundaries',  full: 'Urban Frame Survey — frame work',   blurb: 'Locate • Record • Register • Scrutinise', color: '#0d9488' },
   { id: 'office', name: 'Office & Bills',             full: 'Office & Bills',                    blurb: 'TA/DA • Diary • Tour programme',   color: '#b45309' },
+  { id: 'property',name: 'Property Survey · GIS',      full: 'Urban body property survey',        blurb: 'Ward map • Properties • Areas • Export', color: '#be123c' },
   { id: 'tools',  name: 'Tools & Converters',         full: 'Tools & Converters',                blurb: 'KML • Shapefile • Coordinates',    color: '#7c3aed' }
 ];
 
@@ -78,6 +79,12 @@ window.NSO_TOOLS = [
     use:'You already have the programme as a PDF and just need a clean print.',
     keys:'tentative program create edit print a4 tour' },
 
+  /* ---------- Property survey ---------- */
+  { id:'gis_property_survey', file:'gis_property_survey.html', cat:'property', icon:'building', title:'GIS Property Survey Tool', type:'Survey workspace', isNew:true, featured:true,
+    desc:'Property-by-property survey for an urban body. Ward boundaries are built in; record each property, its use and areas, geo-tag it on the ward map and export to JSON or CSV.',
+    use:'You are surveying properties in an urban body and need records, area totals and a ward-wise progress view.',
+    keys:'gis property survey tax assessment urban body town ward map geo tag area use bye-law records summary export csv json firebase sync' },
+
   /* ---------- Tools ---------- */
   { id:'lat_long_kml', file:'lat_long__KML.html', cat:'tools', icon:'compass', title:'Bulk WKT → KML', type:'Converter',
     desc:'Paste or upload MULTIPOLYGON (WKT) rows. Block, ward and IV numbers are detected automatically and all KMLs download in one ZIP.',
@@ -108,6 +115,7 @@ window.NSO_ICONS = {
   grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
   arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  building:'<path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"/>',
   home:'<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>'
 };
 window.NSO_icon = function(name, size){

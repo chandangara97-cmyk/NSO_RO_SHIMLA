@@ -47,6 +47,7 @@ var WANT={plfs:'I want to track PLFS field work',
  'ufs-ops':'I want to check UFS progress and plan the month',
  'ufs-geo':'I want to find, record and check urban blocks',
  office:'I want to handle office paperwork: bills, diary, tour programme',
+ property:'I want to survey properties in an urban body',
  tools:'I want to convert maps and coordinates'};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function card(t,c){return '<div class="card tool" style="--ac:'+c.color+'"><div class="top"><div class="tile">'+icon(t.icon,22)+'</div><div><h3>'+esc(t.title)+(t.isNew?'<span class="new">NEW</span>':'')+'</h3><div class="type">'+esc(t.type)+'</div></div></div><p>'+esc(t.desc)+'</p><div class="when"><b>Use when:</b> '+esc(t.use)+'</div><a class="open" href="tools/'+esc(t.file)+'">Open '+icon('arrow',18)+'</a></div>'}
