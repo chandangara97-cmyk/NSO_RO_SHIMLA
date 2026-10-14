@@ -1,139 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scheme Hub 2026 | Field survey tools for Himachal Pradesh (Unofficial)</title>
-<meta name="description" content="Unofficial, independent hub of field survey tools and survey indices: PLFS tracking, Urban Frame Survey blocks and boundaries, office bills, KML converters and a GIS property survey tool.">
-<meta name="theme-color" content="#0e2827">
-<meta name="color-scheme" content="light dark">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="landing.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Scheme Hub 2026</title>
+  <meta name="description" content="Field survey tools for Himachal Pradesh: PLFS tracking, Urban Frame Survey blocks and boundaries, office bills and TA/DA, KML converters, survey indices and GIS property survey." />
+  <meta property="og:title" content="Scheme Hub 2026" />
+  <meta property="og:description" content="Field survey tools for Himachal Pradesh: PLFS tracking, Urban Frame Survey blocks and boundaries, office bills and TA/DA, KML converters, survey indices and GIS property survey." />
+  <meta name="theme-color" content="#0e2827" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="SchemeHub" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&display=swap">
 </head>
-<body>
-<div class="unofficial" role="note"><strong>Unofficial.</strong> Independent project, not run by or affiliated with any government body.</div>
-
-<header class="hero" id="hero">
-  <canvas id="terrain" aria-hidden="true"></canvas>
-  <div class="wrap topbar">
-    <a class="brand" href="#hero" aria-label="Scheme Hub 2026, top of page">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" rx="8" fill="#c8372a"/><path d="M15 6 24 22H6z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><circle cx="15" cy="17" r="2" fill="#fff"/></svg>
-      Scheme Hub 2026
-    </a>
-    <nav class="topnav" aria-label="Page sections"><a href="#property">Property survey</a><a href="#tools">Field tools</a><a href="#indices">Indices</a><a href="#releases">Releases</a></nav>
-  </div>
-  <div class="wrap hero-body">
-    <div class="hero-copy">
-      <p class="hello" id="hello">Welcome.</p>
-      <h1><span>Field survey work,</span><span>from boundary</span><span>to bill.</span></h1>
-      <p class="lede">Locate blocks, check listings, log weekly progress, prepare tour bills and survey urban properties. Made for field work in Himachal Pradesh; tools run in your browser and some sync through Firebase.</p>
-      <div class="cta">
-        <a class="btn primary" href="#tools">Open field tools</a>
-        <a class="btn ghost" href="tools/gis_property_survey.html">Open property survey tool</a>
-      </div>
-      <p class="facts" id="facts"></p>
-    </div>
-    <div id="mapZone">
-      <div class="readout" aria-hidden="true">
-        <div>Position<b id="roPos">31.1000° N  77.1700° E</b></div>
-        <div>Elevation<b id="roElev">2,000 m</b></div>
-        <div>Falls in<b id="roBlk">Block 05</b></div>
-        <div class="note">Illustrative terrain. Move the pointer, or tap, to locate a point.</div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<main>
-<section class="showcase" id="property" aria-labelledby="pt-h">
-  <div class="wrap sc-grid">
-    <div>
-      <span class="badge">New</span>
-      <h2 id="pt-h">Survey every property in an urban body, ward by ward.</h2>
-      <p class="intro">Pick your town and the ward map is already there. Record each property, measure its areas, drop a geo-tag and watch progress build up.</p>
-      <ul class="feat">
-        <li><b>Ward map</b><span>Outlines for 67 urban bodies and 572 wards, built into the page.</span></li>
-        <li><b>Property and areas</b><span>One record per property, with areas in square metres and bye-law parameters.</span></li>
-        <li><b>Geo-tag</b><span>Pin the property on the ward map from the field.</span></li>
-        <li><b>Progress and use</b><span>Totals by ward and by use, on the Summary tab.</span></li>
-        <li><b>Export and sync</b><span>Download JSON or CSV, or sync town data through Firebase.</span></li>
-      </ul>
-      <div class="cta">
-        <a class="btn primary" href="tools/gis_property_survey.html">Open property survey tool</a>
-        <a class="btn ghost" href="#tools">See all tools</a>
-      </div>
-    </div>
-    <figure class="frame">
-      <div class="win" aria-hidden="true">
-        <div class="win-head"><i>GIS</i><b>Property Survey Workspace</b></div>
-        <div class="win-tabs"><span class="on">Survey</span><span>Records</span><span>Summary</span></div>
-        <div class="win-body">
-          <div class="pane"><h4>Ward map</h4><svg class="wards" viewBox="0 0 274 420" role="img" aria-label="Outlines of the seven wards of Bhota with a few geo-tagged properties"><path class="ward" d="M137 97L132 84L131 72L132 60L135 49L148 25L159 10L199 12L211 16L222 19L226 25L233 45L245 66L244 71L240 77L228 92L229 101L233 112L242 116L249 117L254 121L258 131L258 136L242 144L236 145L206 146L197 151L193 146L185 153L180 155L169 156L159 152L153 153L150 150L151 144L151 134L148 123L149 121L148 111L142 105L137 97Z"><title>Bhota ward 1</title></path><path class="ward" d="M122 94L134 90L137 97L142 105L148 111L149 121L148 123L151 134L151 144L150 150L148 152L145 150L134 150L130 148L117 132L99 132L102 116L108 107L122 94Z"><title>Bhota ward 2</title></path><path class="ward" d="M173 159L164 160L148 170L139 180L129 188L125 190L95 190L84 194L81 197L79 201L80 215L86 226L93 236L93 240L91 242L89 242L83 230L73 214L69 205L68 202L71 197L80 194L82 166L80 160L79 142L83 133L99 132L117 132L124 139L126 144L134 150L145 150L148 152L150 150L153 153L159 152L169 156L180 155L178 159L173 159Z"><title>Bhota ward 3</title></path><path class="ward" d="M14 171L41 156L62 153L80 160L82 166L80 194L71 197L68 202L69 205L73 214L83 230L95 252L103 272L121 308L116 338L109 359L107 372L101 387L93 397L84 406L58 410L47 407L31 387L34 349L41 326L42 308L24 282L19 268L10 265L13 256L20 246L19 237L22 229L19 222L13 172L14 171Z"><title>Bhota ward 4</title></path><path class="ward" d="M79 201L84 194L95 190L125 190L129 188L139 180L147 171L148 174L144 183L142 191L146 196L150 222L154 229L152 231L144 229L140 234L134 234L122 238L110 233L104 233L93 236L86 226L80 215L79 201Z"><title>Bhota ward 5</title></path><path class="ward" d="M141 307L121 308L89 242L93 240L93 236L104 233L110 233L122 238L134 234L140 234L144 229L152 231L154 229L150 222L146 196L142 191L144 183L148 174L147 171L164 160L178 159L181 162L182 165L179 175L173 190L174 201L176 210L175 213L170 218L168 218L162 216L162 220L154 234L157 241L164 247L165 249L162 258L164 267L166 291L163 296L155 303L141 307Z"><title>Bhota ward 6</title></path><path class="ward" d="M165 217L168 218L170 218L175 213L176 210L174 201L173 190L179 175L182 165L181 162L178 159L180 155L185 153L193 146L197 151L206 146L236 145L242 144L256 137L261 151L263 165L262 177L264 187L262 195L257 200L249 206L240 215L239 226L236 244L229 260L217 273L193 284L181 292L163 296L166 291L164 267L162 258L165 249L164 247L157 241L154 234L162 220L162 216L165 217Z"><title>Bhota ward 7</title></path><text class="wlab" x="191" y="106">1</text><text class="wlab" x="134" y="129">2</text><text class="wlab" x="114" y="184">3</text><text class="wlab" x="58" y="274">4</text><text class="wlab" x="122" y="214">5</text><text class="wlab" x="150" y="232">6</text><text class="wlab" x="199" y="212">7</text><circle class="pt" cx="205" cy="87" r="6"/><circle class="pt" cx="98" cy="191" r="6"/><circle class="pt" cx="68" cy="287" r="6"/><circle class="pt" cx="142" cy="211" r="6"/><circle class="pt" cx="211" cy="217" r="6"/><circle class="pt" cx="116" cy="229" r="6"/></svg></div>
-          <div class="pane">
-            <h4>Survey setup</h4><span class="lbl">Town</span><span class="fld m"></span>
-            <h4>Property</h4><span class="lbl">Owner and address</span><span class="fld"></span><span class="fld s"></span>
-            <h4>Areas (sq m)</h4><span class="fld m"></span>
-            <h4>Progress</h4><div class="bar"><i></i></div>
-          </div>
-        </div>
-      </div>
-      <figcaption>The seven ward outlines of Bhota, as built into the tool. The form and the geo-tags shown are a sketch of the screen.</figcaption>
-    </figure>
-  </div>
-</section>
-
-<section class="sec wrap" id="tools" aria-labelledby="tools-h">
-  <div class="sec-head">
-    <div><h2 id="tools-h">Field tools, by the job you need done</h2><p>Each tool says when to use it. Search by what you are doing, such as bill, KML or boundary.</p></div>
-  </div>
-  <div class="finder"><input id="tq" type="search" placeholder="Search a tool" aria-label="Search tools" autocomplete="off"></div>
-  <div class="chips" id="chipsTools" role="group" aria-label="Filter by work area" style="margin-bottom:10px"></div>
-  <div id="toolgroups"></div>
-</section>
-
-<section class="sec wrap" id="indices" aria-labelledby="ind-h">
-  <div class="sec-head"><div><h2 id="ind-h">Survey indices</h2><p>Figures from public central and state releases. Each value links to its source.</p></div></div>
-  <div class="finder">
-    <input id="q" type="search" placeholder="Search survey, index or publisher" aria-label="Search survey indices" autocomplete="off">
-    <span class="chips" id="levels"><button class="chip" data-level="all" aria-pressed="true">All</button><button class="chip" data-level="central" aria-pressed="false">Central</button><button class="chip" data-level="state" aria-pressed="false">State</button></span>
-  </div>
-  <div class="cards" id="cards"></div>
-</section>
-
-<section class="sec wrap" id="releases" aria-labelledby="rel-h">
-  <div class="sec-head"><div><h2 id="rel-h">Releases</h2><p>A daily check lists new central and state publications. Dates can change; confirm on the release calendar.</p></div></div>
-  <div class="rel">
-    <div class="col gap">
-      <div>
-      <h3>Latest releases</h3>
-      <div class="chips small" id="chips"><button class="chip" data-org="all" aria-pressed="true">All</button><button class="chip" data-org="MoSPI" aria-pressed="false">Central</button><button class="chip" data-org="HP Statistics" aria-pressed="false">State</button></div>
-      <ul class="replist" id="replist"></ul>
-      <p class="meta" id="repmeta" style="margin-top:10px"></p>
-      </div>
-      <div><h3>Official sources</h3><ul class="replist" id="pinned"></ul></div>
-    </div>
-    <div class="col narrow">
-      <h3>Upcoming</h3><ul class="replist" id="upcoming"></ul>
-    </div>
-  </div>
-</section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <p><strong>Unofficial site.</strong> This is an independent project, not an official website, and is not endorsed by or affiliated with any government body or statistical office. Publisher names (such as MoSPI) appear only to credit where public figures come from. Figures are copied from publicly released statistics; always check the linked source before relying on a number.</p>
-    <p>The older tools page is still at <a href="tools.html">tools.html</a>, and the compact tools hub at <a href="tools/index.html">tools/index.html</a>.</p>
-  </div>
-</footer>
-
-<script src="data/indices.js"></script>
-<script src="data/reports.js"></script>
-<script src="reports-ui.js"></script>
-<script src="dashboard.js"></script>
-<script src="tools/assets/tools.js"></script>
-<script src="landing.js"></script>
-<script>renderReports({listId:"replist",metaId:"repmeta",chipsId:"chips",upcomingId:"upcoming",pinnedId:"pinned",limit:15});</script>
+<body class="bg-[#07161d] text-[#edf3fc]">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
