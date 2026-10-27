@@ -6,7 +6,7 @@ Safe by design: if a source can't be fetched or parsed, its previous items are k
 is recorded in "status" — the site never ends up empty because one website was down.
 Needs: pip install beautifulsoup4
 """
-import json, re, sys, datetime as dt, urllib.request, urllib.parse
+import json, re, sys, ssl, datetime as dt, urllib.request, urllib.parse
 from pathlib import Path
 from bs4 import BeautifulSoup, NavigableString, Tag
 
@@ -32,15 +32,30 @@ def safe_date(y, m, d):
     try: return dt.date(int(y), int(m), int(d)).isoformat()
     except ValueError: return None
 
+# Government sites whose TLS certificate is sometimes expired or misconfigured. For these public,
+# read-only pages ONLY, we retry without certificate checking if the normal verified request fails.
+INSECURE_OK_HOSTS = ("mospi.gov.in",)
+
+def _open(url, context=None):
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (survey-dashboard release-checker)"})
+    with urllib.request.urlopen(req, timeout=40, context=context) as r:
+        return r.read().decode(r.headers.get_content_charset() or "utf-8", "replace")
+
 def fetch(url, tries=3):
+    host = urllib.parse.urlparse(url).hostname or ""
     last = None
     for _ in range(tries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (survey-dashboard release-checker)"})
-            with urllib.request.urlopen(req, timeout=40) as r:
-                return r.read().decode(r.headers.get_content_charset() or "utf-8", "replace")
+            return _open(url)
         except Exception as e:  # noqa
             last = e
+            reason = getattr(e, "reason", e)
+            if isinstance(reason, ssl.SSLCertVerificationError) and host.endswith(INSECURE_OK_HOSTS):
+                try:
+                    print(f"WARNING: certificate check failed for {host}; retrying without verification", file=sys.stderr)
+                    return _open(url, ssl._create_unverified_context())
+                except Exception as e2:  # noqa
+                    last = e2
     raise last
 
 def parse(html, base, src):
